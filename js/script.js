@@ -1,16 +1,23 @@
 $(document).ready(function(){
 
+  var shot = [];
+
   function callback (data) {
-    $.each(data.shots, function(key, val) {
-      //items.push('<li id="' + key + '">' + val + '</li>');
-      console.log(key);
-      console.log(val);
+    $.each(data.shots, function(id, obj) {
+      shot[id] = obj;
+    });    
+
+    $.each(shot, function(i) {
+      $("body").append('<img src="'+shot[i].image_url+'">');
+      i++;
     });
+
   };
 
   $.ajax({
     dataType: "jsonp",
-    url: "http://api.dribbble.com/shots/",
+    url: "http://api.dribbble.com/shots/popular",
+    data: {page: 1, per_page: 30},
     success: callback
   });
 
