@@ -1,46 +1,66 @@
 $(document).ready(function(){
 
   var shot = [];
+  var img_count = 6;
+  //Implement these
+  var page_num = (Math.random()*10).toFixed();
+  var per_page = 30;
+  var current_shot = img_count;
+  var initial_run = 0;
+  var refresh = 7000;
 
-  function callback (data) {
+
+  function createShots (data) {
     $.each(data.shots, function(id, obj) {
       shot[id] = obj;
-    });    
-
-    for (var i = 0; i < 12; i++) {
-      $("body").append('<img id="'+i+'" src="'+shot[i].image_url+'">');
+    });
+    if (initial_run < 1) {
+      setupDribbbler();
+      initial_run = 2;
+    }
+    else {
+      showNextShot;
     }
   }
 
-  $.ajax({
-    dataType: "jsonp",
-    url: "http://api.dribbble.com/shots/popular",
-    data: {page: 1, per_page: 30},
-    success: callback
-  });
-
-
-  function callbackNextShot (data) {
-    var shot_num = (Math.random()*30).toFixed();
-    var img_num = (Math.random()*11).toFixed();
-
-    $.each(data.shots, function(id, obj) {
-      shot[id] = obj;
-    });
-
-    $("#"+img_num).attr("src", shot[shot_num].image_url);
+  function setupDribbbler () {
+    for (var i = 0; i < img_count; i++) {
+      var image = shot[i].image_url;
+      $("body").append('<a href="'+image+'" rel="lightbox"><img id="'+i+'" src="'+image+'"></a>');
+    }
   }
 
-  function getNextShot () {
-    var page_num = (Math.random()*10).toFixed();
+  function showNextShot () {
+    var img_num = (Math.random()*(img_count - 1 )).toFixed();
+
+    if (current_shot < per_page) {
+      $("#"+img_num).attr("src", shot[current_shot].image_url);
+      current_shot ++;
+    }
+    else {
+      current_shot = 0;
+      if (page_num < 10){
+        ++page_num;
+      }
+      else {
+        page_num = 1;
+      }
+      getShots(page_num);
+    }
+  }
+
+  function getShots (page) {
     $.ajax({
       dataType: "jsonp",
       url: "http://api.dribbble.com/shots/popular",
-      data: {page: page_num, per_page: 30},
-      success: callbackNextShot
+      data: {page: page, per_page: per_page},
+      success: createShots
     });
   }
 
-  window.setInterval(getNextShot, 5000);
+  //getShots(1, callback)
+  getShots((Math.random()*10).toFixed());
+  //window.setInterval(getNextShot, 7000);
+  window.setInterval(showNextShot, refresh);
 
 }); // End document ready function
