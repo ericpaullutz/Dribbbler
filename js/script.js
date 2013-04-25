@@ -1,22 +1,22 @@
 $(document).ready(function(){
 
   var shot = [];
-  var img_count = 6;
+  var img_count = 3;
   //Implement these
   var page_num = (Math.random()*10).toFixed();
   var per_page = 30;
   var current_shot = img_count;
-  var initial_run = 0;
-  var refresh = 7000;
+  var initial_run = true;
+  var refresh = 20000;
 
 
   function createShots (data) {
     $.each(data.shots, function(id, obj) {
       shot[id] = obj;
     });
-    if (initial_run < 1) {
+    if (initial_run === true) {
       setupDribbbler();
-      initial_run = 2;
+      initial_run = false;
     }
     else {
       showNextShot;
@@ -58,9 +58,20 @@ $(document).ready(function(){
     });
   }
 
+  function adjustElements () {
+    $("body").css("height", $(window).height());
+    top_percent = ((($("a").height())-($("img").height()))/2);
+    $("img").css("top", top_percent+"px");
+  }
+
+
   //getShots(1, callback)
   getShots((Math.random()*10).toFixed());
   //window.setInterval(getNextShot, 7000);
   window.setInterval(showNextShot, refresh);
+
+  adjustElements();
+
+  $(window).resize(adjustElements);
 
 }); // End document ready function
